@@ -50,8 +50,15 @@
 - Previewed the homepage, quickstart, debugging guide and build article in Chrome. Verified navigation, headings and code blocks.
 - Non-fatal starter warnings: embedding prebuild skipped because its import hit the server-only boundary; Next warned about the parent-directory lockfile and deprecated middleware naming. Framework files were kept within their managed ownership boundary. These warnings did not stop the production build.
 
-## Remaining checks
+## Production verification
 
-- Record production deployment and live content verification results.
-- Confirm all live URLs display the authored content.
-- User review: sandbox login, the three product pages, the build article and observations.
+- Published content commit `3b480b4` to `main`.
+- Thally Cloud Deployments showed the commit message as Current, Successful, and Production LIVE NOW / Healthy (duration 2m 29s).
+- Opened the production homepage in Chrome and confirmed the new DevKit introduction and navigation.
+- Fetched the production quickstart, debugging guide and build article with curl; all returned the expected authored content.
+- Verified `/introduction` resolves to the canonical homepage content. Its Markdown output intentionally uses the frontmatter title rather than the visual Hero title.
+
+## User review before submission
+
+- Exercise sandbox login with your own credentials; the automated checks used synthetic credentials.
+- Review the three product pages, build article and observations against your own experience.
