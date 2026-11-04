@@ -1,47 +1,130 @@
 ---
-title: Quickstart
-description: Guide a new reader through one useful workflow and show them how to verify it.
+title: Receive your first signed webhook
+navTitle: Quickstart
+description: Install Monnify DevKit v0.4.0 and deliver a simulated payment event to a local Express handler that verifies its signature.
 ---
 
-A strong quickstart produces one meaningful result. Replace the placeholders
-below with the shortest supported path for your product.
+By the end of this quickstart, your local app will accept a signed
+`SUCCESSFUL_TRANSACTION` event and print its transaction reference. The event
+is simulated: no checkout or payment is created in Monnify.
 
 ## Before you begin
 
-List only the requirements needed for this workflow:
+You need:
 
-- An account or credential, when required
-- A supported runtime, device, browser, or operating system
-- Permission to create or change the resource used in the example
+- **Node.js 22.14 or later in the 22.x series, or Node.js 24 or later**, with npm.
+- A [Monnify sandbox account](https://app.monnify.com/), its API key beginning with `MK_TEST_`, its secret key, and its contract code.
+- Internet access to install packages and authenticate with the sandbox.
+- Two terminal windows and an available local port `3000`.
 
-<Steps>
-  <Step title="Install the required tool">
-    Give readers one recommended installation command.
+The shell examples use Bash or Zsh on macOS or Linux. On Windows, you can follow
+them in WSL. Run `node --version` and `npm --version` to check your installation.
 
-    ```bash
-    npm install your-package
-    ```
-  </Step>
-  <Step title="Add the minimum configuration">
-    Include only the values needed for the first successful run.
+## 1. Install DevKit
 
-    ```bash
-    your-cli init
-    ```
-  </Step>
-  <Step title="Complete the first task">
-    Use a realistic example that produces an observable result.
+```bash
+npm install --global monnify-devkit@0.4.0
+monnify --version
+```
 
-    ```bash
-    your-cli start
-    ```
-  </Step>
-  <Step title="Verify the result">
-    State exactly what the reader should see and how to recover when it does not appear.
-  </Step>
-</Steps>
+The version command should print:
 
-## Choose the next task
+```text
+0.4.0
+```
 
-Link to the guide that naturally follows this result. Avoid ending the reader’s
-journey with a generic list of every feature.
+If you cannot install global packages, use `npx --yes monnify-devkit@0.4.0` in
+place of `monnify` throughout this guide.
+
+## 2. Log in to the sandbox
+
+```bash
+monnify login
+```
+
+Enter your sandbox API key, secret key, and contract code when prompted. The
+secret is masked. DevKit verifies the credentials with Monnify before saving
+them to `~/.monnify/config.json` with file permissions `600`.
+
+Success looks like `✓ Logged in as …`. Keep these credentials on your computer;
+use the interactive prompt rather than putting the secret in a command.
+
+## 3. Create your webhook handler
+
+In **terminal 1**, run:
+
+```bash
+monnify init webhook-demo
+cd webhook-demo
+npm install
+cp .env.example .env
+```
+
+Open `.env` in your editor. Replace `your_sandbox_secret_key` with the **same
+secret you entered during login**. Keep `PORT=3000`.
+
+```dotenv
+MONNIFY_SECRET_KEY=your_sandbox_secret_key
+PORT=3000
+```
+
+Start the app with Node's environment-file support:
+
+```bash
+node --env-file=.env server.js
+```
+
+Keep this terminal running. You should see `Listening on http://localhost:3000`.
+The `--env-file` flag matters: the generated `npm start` command does not load
+`.env` by itself.
+
+The scaffold creates `POST /webhooks`. It verifies the `monnify-signature`
+header against an HMAC-SHA512 of the raw request body using your secret.
+
+## 4. Send a simulated payment event
+
+In **terminal 2**, run:
+
+```bash
+monnify trigger SUCCESSFUL_TRANSACTION --forward-to http://localhost:3000/webhooks --amount 5000 --reference docs-first-payment
+```
+
+DevKit signs the generated payload with the secret stored during login.
+`--amount 5000` means NGN 5,000 in the simulated payload.
+
+The sender should report HTTP `200`, similar to:
+
+```text
+✓ 200 SUCCESSFUL_TRANSACTION → http://localhost:3000/webhooks (…)
+```
+
+In **terminal 1**, confirm the handler accepted the signature and parsed the event:
+
+```text
+✓ SUCCESSFUL_TRANSACTION — reference: docs-first-payment
+```
+
+Seeing both results confirms that a signed event reached your app and passed
+its signature check. The generated handler logs the event; you still need to
+implement any application-specific processing.
+
+## Troubleshooting
+
+| Symptom | What to check |
+| --- | --- |
+| `monnify: command not found` | Reopen your terminal after installation, or use the `npx` alternative above. |
+| Authentication fails | Use sandbox credentials from the same account. The API key must begin with `MK_TEST_`. Login also requires a working internet connection. |
+| `No config found` | Run `monnify login` under the same operating-system user as the trigger command. |
+| `Directory "webhook-demo" already exists` | Choose a fresh name, such as `monnify init webhook-demo-2`, and enter that directory. |
+| `EADDRINUSE` | Set `PORT=3001` in `.env`, restart the app, and send to `http://localhost:3001/webhooks`. |
+| `Could not reach …` | Keep terminal 1 running and check the port in the target URL. |
+| HTTP `404` | Send to `/webhooks`, rather than the app's root URL. |
+| HTTP `401` and `bad signature` | Make `.env` match the login secret and restart the app with `node --env-file=.env server.js`. |
+
+## Next: inspect a delivery
+
+Follow [Inspect and debug webhook deliveries](/guides/debug-webhooks) to see the
+payload and forwarding result in your browser, then replay an event.
+
+When you finish testing, press **Ctrl+C** in terminal 1. The scaffold's
+`.gitignore` excludes `.env`; keep your secret out of source control.

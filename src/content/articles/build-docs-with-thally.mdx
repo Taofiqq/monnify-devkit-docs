@@ -1,0 +1,166 @@
+---
+title: Publish a developer documentation site with Thally
+navTitle: Build this site
+description: Follow the workflow used to publish these Monnify DevKit docs, from Cloud setup and GitHub connection to MDX content and validation.
+---
+
+I co-built Monnify DevKit, a CLI for testing Monnify sandbox integrations. For
+this documentation project, I chose one outcome: help a developer receive a
+signed simulated webhook, then inspect and debug its delivery.
+
+This article shows how to create a similar site with Thally. The result is a
+public documentation site backed by a GitHub repository you own.
+
+## Prerequisites
+
+You need a [Thally Cloud account](https://app.thally.io/), a GitHub account with
+permission to install the Thally GitHub App, Git, and Node.js with npm. For this
+starter, use Node.js **22.14 or later in the 22.x series, or 24 or later**.
+
+You also need a project you understand and one workflow you can test. Monnify
+credentials are needed to follow the DevKit quickstart; they are not needed
+to build this documentation site.
+
+Start with [Thally's quickstart](https://docs.thally.io/quickstart), which explains
+the current onboarding flow and account requirements.
+
+## Create the Cloud site
+
+Sign in to Thally Cloud and choose **Create a site**. Enter your project's
+name, a short explanation of what it does, and an available `thally.app` address.
+I used **Monnify DevKit** and `monnify-devkit.thally.app`.
+
+At **Docs source**, select **Create a new docs repository** and connect GitHub.
+For this path, Thally's quickstart requires **All repositories** access so the
+GitHub App can initialize the new repository. Review that scope before
+installing. For selected-repository access, the documented alternative is to
+connect an existing compatible Thally repository.
+
+Name the repository clearly. I chose `monnify-devkit-docs` and made it public
+so reviewers could inspect the source. It is separate from the CLI repository.
+
+I skipped **Product sources** and **Knowledge surfaces**. Those configure Track
+automation and additional update destinations; this project needed a focused
+documentation site. Review the site address and repository, then select
+**Publish site**. Wait for **Live** on the Home page and open the published URL.
+
+At this point the site contains starter content. The next step is to replace it
+with instructions for your product.
+
+## Clone the repository and choose your content
+
+Clone the exact repository shown in the Cloud dashboard:
+
+```bash
+git clone https://github.com/Taofiqq/monnify-devkit-docs.git
+cd monnify-devkit-docs
+npm ci
+```
+
+Substitute your own repository URL and directory if you are creating a new
+site. To reproduce this example, the commands above use its public source.
+
+Read `AGENTS.md` and keep changes within the starter's content boundaries:
+
+| File | Purpose |
+| --- | --- |
+| `src/content/*.mdx` | Documentation pages and frontmatter |
+| `docs.json` | Navigation, page order, and redirects |
+| `src/data/site.ts` | Product identity and links |
+
+I kept three product pages: an introduction, a quickstart, and a debugging
+guide. Each starts with the reader's outcome and links to the next task.
+
+Create a page with `title` and `description` frontmatter:
+
+```mdx
+---
+title: Receive your first signed webhook
+description: Deliver a simulated payment event to your local handler.
+---
+
+By the end of this guide, your app will accept a signed test event.
+
+## Before you begin
+
+List the runtime, credentials, and running services the reader needs.
+```
+
+## Configure navigation and verify the instructions
+
+Add each page's path to `docs.json`, without the `.mdx` extension. This is the
+product documentation tab used here:
+
+```json
+{
+  "tab": "Documentation",
+  "groups": [
+    { "group": "Get started", "pages": ["introduction", "quickstart"] },
+    { "group": "Guides", "pages": ["guides/debug-webhooks"] }
+  ]
+}
+```
+
+Place this entry inside the existing `tabs` array. Remove unused starter
+navigation, update site links, and replace the sample API specification so
+unrelated demo endpoints are not presented as your product. Redirect retired
+starter URLs to relevant pages.
+
+Before documenting a command, read its implementation and run it. In DevKit,
+the receiver acknowledges requests before forwarding them, so a sender's HTTP
+`200` does not prove that the application accepted the webhook. The guide
+therefore explains the inspector's separate forwarding result.
+
+The local workflow was tested against the published v0.4.0 package using
+synthetic credentials in an isolated profile. The checks covered signed
+delivery, inspector events, forwarding, replay, a mismatched secret, and an
+unreachable handler. Live sandbox authentication was not part of those checks.
+
+## Preview and publish
+
+Run the project's validation commands:
+
+```bash
+npm run check -- --ci
+npm run typecheck
+npm run build
+npm run dev
+```
+
+Open `http://localhost:3040`. Check the homepage, navigation, code blocks, and
+page links, then stop the server with **Ctrl+C**. Resolve validation or build
+errors before publishing.
+
+Review the diff and commit only the intended files. Push your commit to the
+production branch connected in Thally Cloud:
+
+```bash
+git diff
+git status
+git add src/content docs.json src/data/site.ts openapi.yaml README.md AGENTS.md assessment
+git commit -m "Document the Monnify DevKit webhook workflow"
+git push origin main
+```
+
+For your project, adjust the staged paths to match your changes. In Thally
+Cloud, open **Deployments**, confirm the new deployment succeeds, and check
+that the live pages show your updated content.
+
+## Decisions and friction
+
+The Cloud wizard made the first deployment straightforward: the dashboard
+showed both the live address and the repository. Optional Track steps added
+choices during setup, so I kept them outside this site's scope.
+
+The new-repository path required broader GitHub access than a single docs
+repository. I followed the documented path; explaining that requirement
+earlier in the wizard would help users decide before leaving for GitHub.
+
+Locally, the default shell used Node.js 23, which is outside the starter's
+declared engine range. I switched to the installed Node.js 22.14 runtime
+before installing dependencies. Check `node --version` against `package.json`
+when reproducing the setup.
+
+The finished [documentation](/introduction) and
+[source repository](https://github.com/Taofiqq/monnify-devkit-docs) show how
+these decisions translate into a small site with testable instructions.

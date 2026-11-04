@@ -1,0 +1,135 @@
+---
+title: Inspect and debug webhook deliveries
+navTitle: Debug webhooks
+description: Use the DevKit v0.4.0 inspector to trace a signed webhook into your app, diagnose signature failures, and replay a stored event.
+---
+
+Use the live inspector when your sender reports success but your app does not
+process an event. You will trace a simulated payment through the receiver into
+your handler and distinguish a delivery problem from a signature problem.
+
+## Before you begin
+
+Complete the [quickstart](/quickstart). You need DevKit **v0.4.0**, a saved
+sandbox login, and the generated `webhook-demo` app. Keep the app running in
+**terminal 1** on port `3000`, using the same secret as your DevKit login.
+
+Open two more terminals. The receiver will use port `4400` and your browser
+will display its inspector.
+
+## 1. Put the receiver between DevKit and your app
+
+In **terminal 2**, run:
+
+```bash
+monnify listen --inspect --forward-to http://localhost:3000/webhooks
+```
+
+The receiver opens the inspector at `http://localhost:4400/`. Open that address
+manually if your browser does not launch. Keep this terminal running.
+
+Your delivery path is now:
+
+```text
+trigger → receiver + inspector (port 4400) → Express /webhooks (port 3000)
+```
+
+The receiver verifies the incoming signature, records the event, and forwards
+the original body and signature to your app.
+
+## 2. Send through the receiver
+
+Keep the inspector open. In **terminal 3**, run:
+
+```bash
+monnify trigger SUCCESSFUL_TRANSACTION --forward-to http://localhost:4400 --amount 5000 --reference docs-debug-payment
+```
+
+Notice that this target is the **receiver on port 4400**. Sending directly to
+port `3000` bypasses the inspector.
+
+In the browser, the new event should show:
+
+- Event type `SUCCESSFUL_TRANSACTION`.
+- **signature valid**: the receiver's signature check passed.
+- **forwarded 200**: your app returned HTTP `200`.
+- Reference `docs-debug-payment` and amount `NGN 5,000`.
+- The JSON payload, including `eventData.amountPaid` and `eventData.transactionReference`.
+
+Terminal 1 should also print the accepted transaction reference.
+
+<Note type="info" title="Check both delivery results">
+  The receiver acknowledges a request with HTTP `200` before verifying or
+  forwarding it. A `200` in terminal 3 confirms receipt by the receiver.
+  Check **signature valid**, the **forwarded** result, and your app's logs to
+  confirm the whole path worked.
+</Note>
+
+## 3. Diagnose a rejected signature
+
+You can reproduce a secret mismatch in the generated demo app:
+
+1. Stop the app in terminal 1 with **Ctrl+C**. Leave the receiver running.
+2. Edit the demo app's `.env` and temporarily set `MONNIFY_SECRET_KEY` to `deliberately-wrong-example`.
+3. Restart the app with `node --env-file=.env server.js`.
+4. Repeat the trigger command from step 2.
+
+The inspector should show **signature valid** and **forwarded 401**. The
+receiver accepted the signature using your saved login secret, but the app
+rejected it using the different secret. Terminal 1 prints
+`✗ webhook rejected: bad signature`.
+
+Restore the correct sandbox secret in `.env`, restart the app, and send again.
+Confirm that **forwarded 200** returns.
+
+If both processes use the same secret and verification still fails in your
+own application, check how you read the body. The signature depends on the
+exact request bytes. Parsing JSON and serializing it again can change those
+bytes. The generated Express route uses `express.raw()` for this reason;
+keep JSON-parsing middleware from consuming that route's body first.
+
+## 4. Replay the same event
+
+In terminal 3, list the recent deliveries:
+
+```bash
+monnify events --last 10
+```
+
+DevKit records both the trigger and receiver steps, so one send can produce
+two rows. Find the row for your event whose **Source** is `trigger` and whose
+**Target** is `http://localhost:4400`. Copy its **Id**.
+
+Replace `EVENT_ID` below with that value:
+
+```bash
+monnify replay --id EVENT_ID --forward-to http://localhost:4400
+```
+
+You should see a new inspector event with the **same transaction reference**
+and payload. DevKit signs the replay with your current saved secret.
+
+The generated demo logs the event again. In your integration, use replays to
+check that repeated deliveries do not repeat a business action, such as
+crediting the same payment twice. The scaffold does not implement that
+duplicate-handling logic for you.
+
+## Troubleshooting
+
+| Symptom | Likely cause and next action |
+| --- | --- |
+| `unknown option '--inspect'` | Check `monnify --version` and install `monnify-devkit@0.4.0`. |
+| No event appears in the inspector | Open the inspector before sending. Target port `4400`; the browser receives live events and does not reload stored history. |
+| **signature invalid** | The incoming signature does not match the receiver's saved secret, or the body changed after signing. Check the sender's secret and original body. The receiver is a diagnostic tool and can still forward this request. |
+| **forwarded 401** | Check the handler's secret and raw-body verification. Restart the handler after changing `.env`. |
+| **forwarded 404** | Confirm the forwarding URL includes `/webhooks`. |
+| **forwarded x** or `forward failed` | The receiver could not reach your app. Check terminal 1, port `3000`, and the forwarding URL. |
+| The event log has no HTTP status for a `listen` row | Receiver rows store the received payload without a forwarding status in v0.4.0. Use the live inspector or terminal 2 for the downstream result. |
+| Replay reports `No event with id …` | Copy an actual Id from `monnify events`; it is different from the transaction reference in the payload. |
+
+Stop the receiver and app with **Ctrl+C** in terminals 2 and 1 when finished.
+DevKit stores event payloads locally in `~/.monnify/events.jsonl`.
+
+You have now checked receipt, signature verification, forwarding, and repeated
+delivery. For other commands and flags, run `monnify --help` or
+`monnify listen --help`.

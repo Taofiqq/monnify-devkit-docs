@@ -183,6 +183,6 @@ export const siteConfig: SiteConfig = {
     { label: "Get started", href: "/quickstart" },
     { label: "Support", href: "https://github.com/Taofiqq/monnify-devkit-docs/issues/new" },
     { label: "GitHub", href: "https://github.com/Taofiqq/monnify-devkit-docs" },
-    { label: "Changelog", href: "/changelog" },
+    { label: "DevKit source", href: "https://github.com/Tawakalt10/monnify-devkit" },
   ],
 };

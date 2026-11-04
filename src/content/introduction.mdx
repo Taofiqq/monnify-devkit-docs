@@ -1,45 +1,58 @@
 ---
 title: Introduction
-description: Give readers a clear path from their first question to a result they can verify.
+description: Test Monnify sandbox integrations from your terminal, starting with a signed webhook delivered to your local app.
 mode: home
 ---
 
 <Hero
-  title="Build documentation around the reader"
-  subtitle="Start with a useful first result, organize what follows, and publish every format from one reviewable source."
-  primaryLabel="Get started"
+  title="Test your webhook handler locally"
+  subtitle="Monnify DevKit helps you simulate signed payment events, inspect deliveries, and debug your integration before deployment."
+  primaryLabel="Send your first webhook"
   primaryHref="/quickstart"
-  secondaryLabel="Publish your docs"
-  secondaryHref="/guides/create-a-site"
+  secondaryLabel="Explore the source"
+  secondaryHref="https://github.com/Tawakalt10/monnify-devkit"
 />
 
-## Build the reader journey
+## What is Monnify DevKit?
 
-Begin with the task that brings most readers to your documentation, then make
-the next useful step obvious.
+Monnify DevKit is a command-line toolkit for developers integrating
+[Monnify](https://monnify.com/) payments into an application. It brings sandbox
+payment requests, webhook simulation, and delivery diagnostics into your terminal.
+
+Use it when you are building a payment integration, investigating a webhook that
+your app rejects, or checking how your handler responds to a repeated event.
+These docs assume you can run terminal commands and understand basic HTTP requests.
+
+## What can you do?
+
+- **Start with a working handler.** Generate a small Express app that checks webhook signatures.
+- **Simulate a payment event.** Send a signed payload directly to your app without completing a checkout.
+- **See the delivery path.** Inspect the payload, signature result, and downstream HTTP response in your browser.
+- **Repeat an event.** Replay a stored payload to exercise your app's duplicate-handling logic.
+- **Call the sandbox API.** Create sandbox checkout sessions and look up transactions or bank codes.
+
+<Note type="info" title="Sandbox only">
+  DevKit v0.4.0 uses Monnify's sandbox API and accepts sandbox API keys beginning
+  with `MK_TEST_`. Simulated webhooks are generated locally; they do not create
+  payments or change a balance in Monnify.
+</Note>
+
+## Your path through these docs
 
 <CardGroup cols="2">
-  <Card title="Write your quickstart" icon="party-horn" href="/quickstart">
-    Turn prerequisites, setup, one realistic task, and verification into a short path.
+  <Card title="Receive your first signed webhook" icon="terminal" href="/quickstart">
+    Install DevKit, configure sandbox credentials, and receive a simulated payment event in an Express app.
   </Card>
-  <Card title="Organize your navigation" icon="grid-round" href="/customization">
-    Group related tasks and references around how people use your product.
-  </Card>
-  <Card title="Document your API" icon="code-simple" href="/api">
-    Replace `openapi.yaml` to publish browsable endpoint docs with a live playground.
-  </Card>
-  <Card title="Learn the Thally workflow" icon="wrench" href="/guides/create-a-site">
-    Create, publish, and update sites from the Cloud dashboard, the CLI, or your AI tools.
+  <Card title="Inspect and debug deliveries" icon="search" href="/guides/debug-webhooks">
+    Follow an event through the inspector, diagnose a rejected signature, and replay the same payload.
   </Card>
 </CardGroup>
 
-## Publish from one source
+## Version and scope
 
-Thally turns the same reviewed content into HTML, search, agent discovery files,
-Markdown mirrors, and a read-only MCP surface — so people and AI tools read the
-same, current answer. Add only the locales your readers need.
+These instructions target **Monnify DevKit v0.4.0**. The examples use a local
+Express handler and simulated events. You need Monnify sandbox credentials for
+the initial login, even though subsequent simulation runs locally.
 
-<Note type="info" title="Start with the product, not the template">
-  Replace this page with the questions, terminology, and workflows your readers
-  already use. Keep `docs.json` focused on the path between those tasks.
-</Note>
+For the complete command list, run `monnify --help`. For Monnify's API contracts
+and dashboard setup, use the [official Monnify documentation](https://developers.monnify.com/).

@@ -23,46 +23,80 @@
   },
   "tabs": [
     {
-      "tab": "Get started",
+      "tab": "Documentation",
       "groups": [
         {
           "group": "Get started",
-          "pages": ["introduction", "quickstart"]
+          "pages": [
+            "introduction",
+            "quickstart"
+          ]
         },
         {
-          "group": "Design your docs",
-          "pages": ["components", "customization"]
-        }
-      ]
-    },
-    {
-      "tab": "Guides",
-      "groups": [
-        {
-          "group": "Work with Thally",
+          "group": "Guides",
           "pages": [
-            "guides/create-a-site",
-            "guides/work-with-the-cli",
-            "guides/connect-ai-tools"
+            "guides/debug-webhooks"
           ]
         }
       ]
     },
     {
-      "tab": "API Reference",
+      "tab": "Build with Thally",
       "groups": [
         {
-          "group": "Overview",
-          "pages": ["api/introduction", "api/authentication"]
+          "group": "Tutorial",
+          "pages": [
+            "articles/build-docs-with-thally"
+          ]
         }
-      ],
-      "api": {
-        "source": "openapi.yaml"
-      }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/components",
+      "destination": "/introduction",
+      "permanent": false
     },
     {
-      "tab": "Changelog",
-      "href": "/changelog"
+      "source": "/customization",
+      "destination": "/introduction",
+      "permanent": false
+    },
+    {
+      "source": "/guides/create-a-site",
+      "destination": "/quickstart",
+      "permanent": false
+    },
+    {
+      "source": "/guides/work-with-the-cli",
+      "destination": "/quickstart",
+      "permanent": false
+    },
+    {
+      "source": "/guides/connect-ai-tools",
+      "destination": "/guides/debug-webhooks",
+      "permanent": false
+    },
+    {
+      "source": "/api",
+      "destination": "/introduction",
+      "permanent": false
+    },
+    {
+      "source": "/api/introduction",
+      "destination": "/introduction",
+      "permanent": false
+    },
+    {
+      "source": "/api/authentication",
+      "destination": "/introduction",
+      "permanent": false
+    },
+    {
+      "source": "/changelog",
+      "destination": "/introduction",
+      "permanent": false
     }
   ]
 }
