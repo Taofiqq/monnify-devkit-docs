@@ -111,10 +111,13 @@ the receiver acknowledges requests before forwarding them, so a sender's HTTP
 `200` does not prove that the application accepted the webhook. The guide
 therefore explains the inspector's separate forwarding result.
 
-The local workflow was tested against the published v0.4.0 package using
-synthetic credentials in an isolated profile. The checks covered signed
+The workflow was tested against the published v0.4.0 package, first with
+synthetic credentials and then with an authenticated Monnify sandbox account.
+The checks covered authentication, read-only bank-list retrieval, signed
 delivery, inspector events, forwarding, replay, a mismatched secret, and an
-unreachable handler. Live sandbox authentication was not part of those checks.
+unreachable handler. The tests used an isolated profile and removed temporary
+credential copies afterward. These checks validate the documented webhook
+workflow; they do not exercise every DevKit command.
 
 ## Preview and publish
 

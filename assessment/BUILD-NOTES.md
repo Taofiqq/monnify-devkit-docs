@@ -21,7 +21,7 @@
 - Keep Monnify's official API docs as the API reference; replace the starter's unrelated JSONPlaceholder example.
 - Put the Part 2 article at its own URL and tab, separate from the three product pages.
 
-## Verification performed
+## Initial verification (synthetic credentials)
 
 - Product source: 11 existing tests passed; typecheck and build passed.
 - Installed the published `monnify-devkit@0.4.0` under a temporary prefix and verified its reported version.
@@ -32,7 +32,7 @@
 - Confirmed replay retains the payload's transaction reference.
 - Confirmed wrong handler secret produces receiver ACK 200, downstream 401, and handler bad-signature log.
 - Confirmed stopped handler still produces receiver ACK 200 and a forward-failed log.
-- Did not exercise live Monnify login or create real sandbox API payment requests. Review the login step manually with sandbox credentials before submission.
+- This initial run did not exercise live Monnify login or create sandbox API payment requests. Authenticated verification was completed in the follow-up run below.
 - Test artifacts are outside the repository at `/private/tmp/monnify-docs-check.IGBSKd/`; only synthetic values are used.
 
 ## Thally setup observations
@@ -58,7 +58,19 @@
 - Fetched the production quickstart, debugging guide and build article with curl; all returned the expected authored content.
 - Verified `/introduction` resolves to the canonical homepage content. Its Markdown output intentionally uses the frontmatter title rather than the visual Hero title.
 
+## Authenticated verification, 2026-11-05
+
+- The user successfully completed the published interactive login with a sandbox API key, secret and contract code.
+- Installed the published v0.4.0 package into a fresh temporary prefix and scaffolded a fresh Express app.
+- All 14 integration checks passed. See `assessment/verification.json` for a sanitized report.
+- Confirmed saved credentials authenticate against `https://sandbox.monnify.com` and the read-only bank-list API returned 374 records.
+- Confirmed the exact quickstart command and handler output, inspector/SSE metadata and forwarding result, replay of the exact payload, bad-signature rejection, wrong-secret diagnosis and recovery, 404 for a wrong path, unreachable-handler diagnosis, existing-directory errors and missing replay-Id errors.
+- Re-ran the 11 source unit tests and source typecheck on Node 22.14.0; all passed.
+- The test copied the saved credentials privately into an isolated profile. It did not alter the user's original configuration or event history. Temporary configuration and `.env` copies were removed in cleanup.
+- No sandbox checkout, transfer or payout was created. This verifies the documented workflow, not every CLI command.
+- Improved the quickstart's credential-location instructions using the actual login experience.
+- Revalidated the updated docs: Thally check reported 0 errors and 0 warnings, typecheck passed, and the production build passed with the same non-fatal starter warnings recorded above.
+
 ## User review before submission
 
-- Exercise sandbox login with your own credentials; the automated checks used synthetic credentials.
 - Review the three product pages, build article and observations against your own experience.

@@ -42,11 +42,17 @@ place of `monnify` throughout this guide.
 monnify login
 ```
 
-Enter your sandbox API key, secret key, and contract code when prompted. The
-secret is masked. DevKit verifies the credentials with Monnify before saving
-them to `~/.monnify/config.json` with file permissions `600`.
+In the Monnify dashboard, open **Developer → API Keys**. Select **Show Keys**
+if the values are hidden. Use the value labelled **API Key** for the first
+prompt, followed by the value labelled **Secret Key** for the second. Scroll
+to the **Contract** section on that page for your contract code.
 
-Success looks like `✓ Logged in as …`. Keep these credentials on your computer;
+Enter each value in the terminal when prompted. The secret is masked. DevKit
+verifies the credentials with Monnify before saving them to
+`~/.monnify/config.json` with file permissions `600`.
+
+Success looks like `✓ Logged in as …`. To recheck the saved login later, run
+`monnify whoami` and look for `✓ valid`. Keep these credentials on your computer;
 use the interactive prompt rather than putting the secret in a command.
 
 ## 3. Create your webhook handler

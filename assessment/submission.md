@@ -16,5 +16,5 @@
 
 - Confirm the authored documentation and article are live at the links above.
 - Review the wording against your own experience.
-- Manually exercise the sandbox login step with your credentials; automated local checks used synthetic credentials and did not authenticate against Monnify.
+- Sandbox login and the documented workflow have been verified with an authenticated account. Review the [verification report](verification.json) for the checks and their scope.
 - Reply to the assessment email with the links and three observations. No email has been sent by the coding agent.

@@ -1,0 +1,83 @@
+{
+  "credential_source": "existing local sandbox login; values excluded",
+  "checks": [
+    {
+      "check": "Published package version is 0.4.0",
+      "result": "passed",
+      "details": "passed"
+    },
+    {
+      "check": "Saved credentials authenticate against Monnify sandbox",
+      "result": "passed",
+      "details": "passed"
+    },
+    {
+      "check": "Authenticated sandbox bank-list API",
+      "result": "passed",
+      "details": "374 bank records returned"
+    },
+    {
+      "check": "Scaffold creates a fresh Express app",
+      "result": "passed",
+      "details": "passed"
+    },
+    {
+      "check": "Exact quickstart trigger and handler output with saved sandbox secret",
+      "result": "passed",
+      "details": "passed"
+    },
+    {
+      "check": "Inspector live stream reports valid signature, forwarded 200, amount and reference",
+      "result": "passed",
+      "details": "passed"
+    },
+    {
+      "check": "Documented replay by trigger-row Id retains exact payload and reference",
+      "result": "passed",
+      "details": "passed"
+    },
+    {
+      "check": "Guide secret-mismatch reproduction: receiver accepts, app rejects with 401",
+      "result": "passed",
+      "details": "passed"
+    },
+    {
+      "check": "Restoring matching secret and restarting fixes delivery",
+      "result": "passed",
+      "details": "passed"
+    },
+    {
+      "check": "Invalid signature: handler rejects; diagnostic receiver records and forwards",
+      "result": "passed",
+      "details": "passed"
+    },
+    {
+      "check": "Wrong handler path returns documented 404",
+      "result": "passed",
+      "details": "passed"
+    },
+    {
+      "check": "Stopped app: inspector reports forwarding failure; direct trigger fails",
+      "result": "passed",
+      "details": "passed"
+    },
+    {
+      "check": "Existing-directory and missing replay-Id errors match docs",
+      "result": "passed",
+      "details": "passed"
+    },
+    {
+      "check": "Original credentials and event history unchanged",
+      "result": "passed",
+      "details": "passed"
+    }
+  ],
+  "verified_on": "2026-11-05",
+  "product_version": "0.4.0",
+  "runtime": "Node.js 22.14.0 on macOS",
+  "scope": "Published quickstart and webhook debugging guide, sandbox authentication, and read-only bank-list retrieval. Other CLI commands were not exercised.",
+  "unit_tests": {
+    "passed": 11,
+    "source_typecheck": "passed"
+  }
+}

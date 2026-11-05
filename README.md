@@ -49,7 +49,7 @@ Push a reviewed commit to the `main` branch connected to Thally Cloud, then insp
 
 ## Verification boundary
 
-The published DevKit v0.4.0 package was tested locally with synthetic credentials in an isolated profile: signed delivery, inspector/SSE, forwarding, replay, wrong-secret rejection and unreachable-handler diagnosis. Live Monnify authentication was not exercised. The account login step requires manual verification before assessment submission.
+The published DevKit v0.4.0 package was tested in a fresh directory with an authenticated Monnify sandbox account: authentication, read-only bank-list retrieval, signed delivery, inspector/SSE, forwarding, replay, wrong-secret rejection, recovery and unreachable-handler diagnosis. All 14 integration checks and the 11 source unit tests passed. The user's original configuration and event history were preserved, and temporary credential copies were removed. The scope is the documented webhook workflow, not every CLI command. See [the sanitized verification report](assessment/verification.json).
 
 ## License
 
